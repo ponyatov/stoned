@@ -2,4 +2,6 @@
 
 # line comment from # ill end of line
 
- 
+# scalars
+
+symbol 'string'

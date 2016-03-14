@@ -12,7 +12,7 @@ struct Sym {
 	Sym(string,string); Sym(string);
 	vector<Sym*> nest; void push(Sym*);
 //	map<string,Sym*> pars; void par(Sym*);
-	virtual string tagval();
+	virtual string tagval(); string tagstr();
 	virtual string dump(int=0); string pad(int);
 	virtual Sym* eval();
 //	virtual Sym* eq(Sym*);
@@ -21,6 +21,8 @@ struct Sym {
 
 extern map<string,Sym*> env;
 extern void env_init();
+
+struct Str: Sym { Str(string); string tagval(); };
 
 extern int yylex();
 extern int yylineno;

@@ -8,6 +8,7 @@ Sym::Sym(string V):Sym("",V) {}
 void Sym::push(Sym*o) { nest.push_back(o); }
 
 string Sym::tagval() { return "<"+tag+":"+val+">"; }
+string Sym::tagstr() { return "<"+tag+":'"+val+"'>"; }
 string Sym::pad(int n) { string S; for (int i=0;i<n;i++) S+='\t'; return S; }
 string Sym::dump(int depth) { string S = "\n"+pad(depth)+tagval();
 //	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)
@@ -21,6 +22,10 @@ Sym* Sym::eval() {
 	for (auto it=nest.begin(),e=nest.end();it!=e;it++)
 		(*it) = (*it)->eval();
 	return this; }
+
+
+Str::Str(string V):Sym("str",V) {}
+string Str::tagval() { return tagstr(); }
 
 map<string,Sym*> env;
 void env_init() {
