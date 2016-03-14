@@ -19,4 +19,26 @@ scalars = [ # \ complex test: scalars, composites and var/assign
 		E # error
 	]
 ] # /
-scalars cInts vNums lMachine specials
+scalars cInts vNums lMachine specials	# check assigned global variables
+
+# fileio: filesystem interface extension
+
+next = dir@MODULE		# create directory for next bI generation
+make = next+'Makefile'	# check file create on +'string'
+
+## check ~ quoting prefix works
+
+doc = next+dir@~doc 	# check file create on +symbol
+
+## nested assignments and user defined lambda/apply
+
+pp = { P: P+'pp' }	# add 'pp' string
+
+skelex = [
+	src = next+file@'src.src'	# source file
+	log = next+file@'log.log'	# engine batch run log
+	core = [					# bI interpreter core sources
+		pp@y lpp hpp cpp make
+	]	
+	doc							# manual
+]
