@@ -5,17 +5,45 @@ string LexString;
 %option noyywrap
 %option yylineno
 %x lexstring
+S [\-\+]?
+N [0-9]+
 %%
-#[^\n]*			{}
+#[^\n]*				{}
 
-'				{BEGIN(lexstring); LexString="";}
-<lexstring>'	{BEGIN(INITIAL); yylval.o=new Str(LexString); return STR;}
-<lexstring>\\t	{LexString+='\t';}
-<lexstring>\\n	{LexString+='\n';}
-<lexstring>\n	{LexString+=yytext[0];}
-<lexstring>.	{LexString+=yytext[0];}
 
-[a-zA-Z0-9_.]+	TOC(Sym,SYM)
+'					{BEGIN(lexstring); LexString="";}
+<lexstring>'		{BEGIN(INITIAL); yylval.o=new Str(LexString); return STR;}
+<lexstring>\\t		{LexString+='\t';}
+<lexstring>\\n		{LexString+='\n';}
+<lexstring>\n		{LexString+=yytext[0];}
+<lexstring>.		{LexString+=yytext[0];}
 
-[ \t\r\n]+		{}
+
+{S}{N}\.{N}			TOC(Num,NUM)
+{S}{N}[eE]{S}{N}	TOC(Num,NUM)
+{S}{N}				TOC(Int,NUM)
+0x[0-9A-F]+			TOC(Hex,NUM)
+0b[01]+				TOC(Bin,NUM)
+
+[a-zA-Z0-9_]+		TOC(Sym,SYM)
+
+\(					TOC(Op,LP)
+\)					TOC(Op,RP)
+\[					TOC(Op,LQ)
+\]					TOC(Op,RQ)
+\{					TOC(Op,LC)
+\}					TOC(Op,RC)
+\<					TOC(Op,LV)
+\>					TOC(Op,RV)
+
+\.					TOC(Op,DOT)
+\,					TOC(Op,COMMA)
+
+\=					TOC(Op,EQ)
+\@					TOC(Op,AT)
+\~					TOC(Op,TILD)
+\:					TOC(Op,COLON)
+
+
+[ \t\r\n]+			{}
 %%

@@ -1,7 +1,22 @@
 # bI test suite
 
-# line comment from # ill end of line
+# line comment from # till end of line
 
-# scalars
-
-symbol 'string'
+scalars = [ # \ complex test: scalars, composites and var/assign
+	symbol 'string'
+	
+	cInts = -01 , 00 , +002 ,N	# int: integer / co,ns = lisp dotted pair /
+	vNums = < -01.20 +3e-4 >	# num: floating point / <vec tor> /
+	lMachine = [				# / [list] / 
+		0x12AF			# hex: machine int
+		0b1101			# bin: bit string
+	]
+	specials = [		# special symbols
+		T # true 
+		F # false 
+		N # nil 
+		D # default
+		E # error
+	]
+] # /
+scalars cInts vNums lMachine specials

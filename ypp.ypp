@@ -2,13 +2,37 @@
 #include "hpp.hpp"
 %}
 %defines %union { Sym*o; }
-%token <o> SYM STR NUM
-%type <o> ex scalar
+%token <o> SYM STR NUM				/* symbol 'string' number			*/
+%token <o> LP RP LQ RQ LC RC LV RV	/* () [] {} <>						*/
+%token <o> EQ AT TILD COLON			/* = @ ~ :							*/
+%token <o> DOT COMMA				/* . ,								*/
+%type <o> ex scalar list lambda		/* expression scalar [list] {lambda}*/
+%type <o> vector cons				/* <vector> co,ns					*/
+
+%left EQ
+%right COMMA
 %%
-REPL : | REPL ex	{ cout << $2->dump();
-				 	cout << "\n------------------";
-				 	cout << $2->eval()->dump();
-				 	cout << "\n==================\n"; } ;
-ex : scalar ;
-scalar : SYM | STR | NUM ;
+REPL : | REPL ex			{ cout << $2->dump();
+				 			cout << "\n------------------";
+				 			cout << $2->eval()->dump();
+				 			cout << "\n==================\n"; } ;
+ex		: scalar
+		| LP ex RP			{ $$=$2; }
+		| LQ list RQ		{ $$=$2; }
+		| LC lambda RP		{ $$=$2; }
+		| LV vector RV		{ $$=$2; }
+		| cons
+		| ex EQ ex			{ $$=$2; $$->push($1); $$->push($3); }
+;
+scalar	: SYM | STR | NUM ;
+cons	: ex COMMA ex		{ $$=new Cons($1,$3); } ;
+list	:					{ $$=new List(); }
+		| list ex			{ $$=$1; $$->push($2); }
+;
+lambda	:					{ $$=new Lambda(); }
+		| lambda ex			{ $$=$1; $$->push($2); }
+;
+vector	:					{ $$=new Vector(); }
+		| vector ex			{ $$=$1; $$->push($2); }
+;
 %%
