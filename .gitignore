@@ -1,0 +1,10 @@
+*~
+*.swp
+exe.exe
+log.log
+ypp.tab.?pp
+lex.yy.c
+/manual.aux
+/manual.log
+/manual.out
+/manual.toc
