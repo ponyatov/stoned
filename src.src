@@ -2,6 +2,8 @@
 
 # line comment from # till end of line
 
+.inc lude.test
+
 scalars = [ # \ complex test: scalars, composites and var/assign
 	symbol 'string'
 	

@@ -1,5 +1,6 @@
 MODULE = $(notdir $(CURDIR))
 # OS = win32|linux
+OS ?= linux
 # TAIL = -n17|-n7|<none>
 
 .PHONY: all
@@ -10,8 +11,10 @@ all: log.log
 clean:
 	rm -rf ./exe.exe log.log ypp.tab.?pp lex.yy.c
 	
+lude.test:
+	touch $@
 ################ minimal lex program Makefile ################
-log.log: ./exe.exe src.src
+log.log: ./exe.exe src.src lude.test
 	./exe.exe < src.src > log.log 
 C = cpp.cpp $(OS).cpp ypp.tab.cpp lex.yy.c
 H = hpp.hpp $(OS).hpp ypp.tab.hpp

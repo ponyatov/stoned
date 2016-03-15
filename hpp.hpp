@@ -28,6 +28,10 @@ struct Sym {
 extern map<string,Sym*> env;
 extern void env_init();
 
+// .directive
+
+struct Directive: Sym { Directive(string); string tagval(); };
+
 // scalars
 
 struct Str: Sym { Str(string); Sym*eval(); string tagval(); };

@@ -1,36 +1,58 @@
 #include "hpp.hpp"
+// ======================================================= error callback
 #define YYERR "\n\n"<<yylineno<<":"<<msg<<"["<<yytext<<"]\n\n"
 void yyerror(string msg) { cout<<YYERR; cerr<<YYERR; exit(-1); }
+// ======================================================= main()
 int main() { env_init(); return yyparse(); }
 
-// abstract symbolic type
+// ============================================== Abstract Symbolic Type (AST)
 
-Sym::Sym(string T,string V) { tag=T; val=V; }
-Sym::Sym(string V):Sym("",V) {}
+// ------------------------------------------------------- constructors
+Sym::Sym(string T,string V) { tag=T; val=V; }			// <T:V>
+Sym::Sym(string V):Sym("",V) {}							// token
+
+// ------------------------------------------------------- nest[]ed elements
 void Sym::push(Sym*o) { nest.push_back(o); }
+
+// ------------------------------------------------------- par{}ameters
 void Sym::par(Sym*o) { pars[o->val]=o; }
 
-string Sym::tagval() { return "<"+tag+":"+val+">"; }
-string Sym::tagstr() { return "<"+tag+":'"+val+"'>"; }
-string Sym::pad(int n) { string S; for (int i=0;i<n;i++) S+='\t'; return S; }
-string Sym::dump(int depth) { string S = "\n"+pad(depth)+tagval();
-	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)
+// ------------------------------------------------------- dumping
+string Sym::tagval() { return "<"+tag+":"+val+">"; }	// <T:V> header string
+string Sym::tagstr() { return "<"+tag+":'"+val+"'>"; }	// <T:'V'> header
+string Sym::dump(int depth) {							// dump as text
+	string S = "\n"+pad(depth)+tagval();				// <T:V>
+	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// par{}ameters
 		S += ","+pr->first;
-	for (auto it=nest.begin(),e=nest.end();it!=e;it++)
+	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// nest[]ed
 		S += (*it)->dump(depth+1);
 	return S; }
+string Sym::pad(int n) { string S; for (int i=0;i<n;i++) S+='\t'; return S; }
+
+// ------------------------------------------------------- evaluation
 
 Sym* Sym::eval() {
-	Sym* E = env[val]; if (E) return E;
-	for (auto it=nest.begin(),e=nest.end();it!=e;it++)
-		(*it) = (*it)->eval();
+	Sym* E = env[val]; if (E) return E;					// lookup in env{}
+	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// recursive eval()
+		(*it) = (*it)->eval();							// with objects replace
 	return this; }
 
-Sym* Sym::eq(Sym*o) { env[val]=o; return o; }
-Sym* Sym::at(Sym*o) { push(o); return this; }
+// ------------------------------------------------------- operators
 
-Sym* Sym::add(Sym*o) { Sym*R = new Op("+");
+Sym* Sym::eq(Sym*o) { env[val]=o; return o; }			// A = B assign
+
+Sym* Sym::at(Sym*o) { push(o); return this; }			// A @ B apply
+
+Sym* Sym::add(Sym*o) { Sym*R = new Op("+");				// A + B add
 	R->push(this); R->push(o); return R; }
+
+// ================================================================= DIRECTIVE
+Directive::Directive(string V):Sym("",V) {
+	while (val.size() && (val[0]!=' ' && val[0]!='\t')) {
+		tag += val[0]; val.erase(0,1); }
+	while (val.size() && (val[0]==' ' || val[0]=='\t')) {
+		               val.erase(0,1); }				}
+string Directive::tagval() { return tagstr(); }
 
 // scalars
 

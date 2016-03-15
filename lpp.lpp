@@ -1,6 +1,10 @@
 %{
 #include "hpp.hpp"
-string LexString;
+string LexString;										// string parse buffer
+void incLude(Sym*inc) {									// .include processing
+	if (!(yyin = fopen((inc->val).c_str(),"r"))) yyerror("");
+	yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE));
+}
 %}
 %option noyywrap
 %option yylineno
@@ -10,6 +14,11 @@ N [0-9]+
 %%
 #[^\n]*				{}					/* == line comment == */
 
+														/* == .directives == */
+^\.end				{yyterminate();}					/* .end */
+^\.inc[ \t]+[^\n]+	{incLude(new Directive(yytext));}	/* .include */
+^\.[a-z]+[^\n]*		TOC(Directive,DIR)					/* .directive */
+										
 '					{BEGIN(lexstring); LexString="";}
 <lexstring>'		{BEGIN(INITIAL); yylval.o=new Str(LexString); return STR;}
 <lexstring>\\t		{LexString+='\t';}
@@ -51,4 +60,8 @@ N [0-9]+
 \^					TOC(Op,POW)
 
 [ \t\r\n]+			{}					/* == drop spaces == */
+
+<<EOF>>			{ yypop_buffer_state();				/* end of .inluded file */
+				if (!YY_CURRENT_BUFFER)
+					yyterminate();}
 %%
