@@ -8,8 +8,7 @@ string LexString;
 S [\-\+]?
 N [0-9]+
 %%
-#[^\n]*				{}
-
+#[^\n]*				{}					/* == line comment == */
 
 '					{BEGIN(lexstring); LexString="";}
 <lexstring>'		{BEGIN(INITIAL); yylval.o=new Str(LexString); return STR;}
@@ -18,24 +17,25 @@ N [0-9]+
 <lexstring>\n		{LexString+=yytext[0];}
 <lexstring>.		{LexString+=yytext[0];}
 
+										/* == numbers == */
+{S}{N}\.{N}			TOC(Num,NUM)		/* floating point */
+{S}{N}[eE]{S}{N}	TOC(Num,NUM)		/* exponential */
+{S}{N}				TOC(Int,NUM)		/* integer */
+0x[0-9A-F]+			TOC(Hex,NUM)		/* machine hex */
+0b[01]+				TOC(Bin,NUM)		/* bin string */
 
-{S}{N}\.{N}			TOC(Num,NUM)
-{S}{N}[eE]{S}{N}	TOC(Num,NUM)
-{S}{N}				TOC(Int,NUM)
-0x[0-9A-F]+			TOC(Hex,NUM)
-0b[01]+				TOC(Bin,NUM)
+[a-zA-Z0-9_]+		TOC(Sym,SYM)		/* == symbol == */
 
-[a-zA-Z0-9_]+		TOC(Sym,SYM)
-
-\(					TOC(Op,LP)
+\(					TOC(Op,LP)			/* == brackets == */
 \)					TOC(Op,RP)
-\[					TOC(Op,LQ)
+\[					TOC(Op,LQ)			/* [list] */
 \]					TOC(Op,RQ)
-\{					TOC(Op,LC)
+\{					TOC(Op,LC)			/* {lambda} */
 \}					TOC(Op,RC)
-\<					TOC(Op,LV)
+\<					TOC(Op,LV)			/* <vector> */
 \>					TOC(Op,RV)
 
+										/* == operators == */
 \.					TOC(Op,DOT)
 \,					TOC(Op,COMMA)
 
@@ -50,5 +50,5 @@ N [0-9]+
 \/					TOC(Op,DIV)
 \^					TOC(Op,POW)
 
-[ \t\r\n]+			{}
+[ \t\r\n]+			{}					/* == drop spaces == */
 %%
