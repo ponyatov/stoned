@@ -54,28 +54,27 @@ Directive::Directive(string V):Sym("",V) {
 		               val.erase(0,1); }				}
 string Directive::tagval() { return tagstr(); }
 
-// scalars
+// =================================================================== SCALARS
 
-Str::Str(string V):Sym("str",V) {}
-Sym* Str::eval() { return this; }
+Scalar::Scalar(string T,string V):Sym(T,V) {};
+Sym* Scalar::eval() { return this; }					// block env{} lookup
+
+// ======================================================= string
+Str::Str(string V):Scalar("str",V) {}
 string Str::tagval() { return tagstr(); }
 
-Int::Int(string V):Sym("int",V) { val=atol(V.c_str()); }
-Sym* Int::eval() { return this; }
+Int::Int(string V):Scalar("int",V) { val=atol(V.c_str()); }
 string Int::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
-Num::Num(string V):Sym("num",V) { val=atof(V.c_str()); }
-Sym* Num::eval() { return this; }
+Num::Num(string V):Scalar("num",V) { val=atof(V.c_str()); }
 string Num::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
-Hex::Hex(string V):Sym("hex",V) {}
-Sym* Hex::eval() { return this; }
-Bin::Bin(string V):Sym("bin",V) {}
-Sym* Bin::eval() { return this; }
+Hex::Hex(string V):Scalar("hex",V) {}
+Bin::Bin(string V):Scalar("bin",V) {}
 
-// composites
+// ================================================================ COMPOSITES
 
 List::List():Sym("[","]") {}
 Vector::Vector():Sym("<",">") {}

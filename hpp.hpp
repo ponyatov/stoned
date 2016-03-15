@@ -28,17 +28,19 @@ struct Sym {
 extern map<string,Sym*> env;
 extern void env_init();
 
-// .directive
+// ================================================================= DIRECTIVE
 
 struct Directive: Sym { Directive(string); string tagval(); };
 
-// scalars
+// =================================================================== SCALARS
 
-struct Str: Sym { Str(string); Sym*eval(); string tagval(); };
-struct Int: Sym { Int(string); Sym*eval(); long val; string tagval(); };
-struct Num: Sym { Num(string); Sym*eval(); double val; string tagval(); };
-struct Hex: Sym { Hex(string); Sym*eval(); };
-struct Bin: Sym { Bin(string); Sym*eval(); };
+struct Scalar: Sym { Scalar(string,string); Sym*eval(); };
+
+struct Str: Scalar { Str(string); string tagval(); };				// string
+struct Int: Scalar { Int(string); long val; string tagval(); };		// integer
+struct Num: Scalar { Num(string); double val; string tagval(); };	// floating
+struct Hex: Scalar { Hex(string); };								// hex
+struct Bin: Scalar { Bin(string); };								// bin str
 
 // composites
 
