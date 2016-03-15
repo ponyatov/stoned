@@ -80,8 +80,9 @@ List::List():Sym("[","]") {}
 Vector::Vector():Sym("<",">") {}
 Cons::Cons(Sym*A,Sym*B):Sym("","") { push(A); push(B); }
 
-// functionals
+// =============================================================== FUNCTIONALS
 
+// ======================================================= operator
 Op::Op(string V):Sym("op",V) {}
 Sym* Op::eval() {
 	if (val=="~") return nest[0]; else Sym::eval();	// quote or nest[]ed eval
@@ -90,14 +91,19 @@ Sym* Op::eval() {
 	if (val=="+") return nest[0]->add(nest[1]);		// A + B add
 	return this; }
 
+// ======================================================= internal function
 Fn::Fn(string V, FN F):Sym("fn",V) { fn=F; }
 Sym* Fn::at(Sym*o) { return fn(o); }
 
+// ======================================================= {la:mbda}
 Lambda::Lambda():Sym("^","^") {}
 Sym* Lambda::eval() { return this; }
 
-// ext:fileio
+// =================================================================== OBJECTS
 
+// ================================================================ ext:FILEIO
+
+// ======================================================= directory
 Dir::Dir(Sym*o):Sym("dir",o->val) {}
 Sym* Dir::dir(Sym*o) { return new Dir(o); }
 Sym* Dir::add(Sym*o) {
@@ -105,21 +111,24 @@ Sym* Dir::add(Sym*o) {
 	if ((o->tag!="dir")&&(o->tag=="file")) F = new File(o);
 	push(F); return F; }
 
+// ======================================================= file
 File::File(Sym*o):Sym("file",o->val) {}
 Sym* File::file(Sym*o) { return new File(o); }
 
-// global environment
+// ====================================================== GLOBAL ENV{}IRONMENT
 
 map<string,Sym*> env;
 void env_init() {
-	env["MODULE"] = new Sym(MODULE);
-	// specials
+	// ----------------------------------------------- metainfo constants
+	env["MODULE"] = new Sym(MODULE);				// module name
+	env["OS"] = new Sym(OS);						// target os
+	// ----------------------------------------------- specials
 	env["T"] = new Sym("bool","true");
 	env["F"] = new Sym("bool","false");
 	env["N"] = new Sym("nil","N");
 	env["D"] = new Sym("default","D");
 	env["E"] = new Sym("error","E");
-	// ext:fileio
+	// ----------------------------------------------- fileio
 	env["dir"] = new Fn("dir",Dir::dir);
 	env["file"] = new Fn("file",File::file);
 }

@@ -8,22 +8,28 @@
 #include <map>
 using namespace std;
 
-// abstract symbolic type
-
+// ============================================== Abstract Symbolic Type (AST)
 struct Sym {
-	string tag,val;
-	Sym(string,string); Sym(string);
+	string tag,val;										// tag:value
+	// --------------------------------------------------- constructors
+	Sym(string,string);									// T:V
+	Sym(string);										// token
+	// --------------------------------------------------- nest[]ed
 	vector<Sym*> nest; void push(Sym*);
+	// --------------------------------------------------- par{}ameters
 	map<string,Sym*> pars; void par(Sym*);
+	// --------------------------------------------------- dumping
 	virtual string tagval(); string tagstr();
 	virtual string dump(int=0); string pad(int);
+	// --------------------------------------------------- evaluate/compute
 	virtual Sym* eval();
-	virtual Sym* eq(Sym*);	// A = B assign
-	virtual Sym* at(Sym*);	// A @ B apply
-	virtual Sym* add(Sym*);	// A + B add
+	// --------------------------------------------------- operators
+	virtual Sym* eq(Sym*);								// A = B assign
+	virtual Sym* at(Sym*);								// A @ B apply
+	virtual Sym* add(Sym*);								// A + B add
 };
 
-// global environment
+// ====================================================== GLOBAL ENV{}IRONMENT
 
 extern map<string,Sym*> env;
 extern void env_init();
@@ -42,22 +48,32 @@ struct Num: Scalar { Num(string); double val; string tagval(); };	// floating
 struct Hex: Scalar { Hex(string); };								// hex
 struct Bin: Scalar { Bin(string); };								// bin str
 
-// composites
+// ================================================================ COMPOSITES
 
-struct List: Sym { List(); };
-struct Vector: Sym { Vector(); };
-struct Cons: Sym { Cons(Sym*,Sym*); };
+struct List: Sym { List(); };									// [list]
+struct Vector: Sym { Vector(); };								// <vector>
+struct Cons: Sym { Cons(Sym*,Sym*); };							// co,ns pair
 
-// functionals
+// =============================================================== FUNCTIONALS
 
+// ======================================================= operator
 struct Op: Sym { Op(string); Sym*eval(); };
+
+// ======================================================= internal function
 typedef Sym*(*FN)(Sym*);
 struct Fn: Sym { Fn(string,FN); FN fn; Sym*at(Sym*); };
+
+// ======================================================= {la:mbda}
 struct Lambda: Sym { Lambda(); Sym*eval(); };
 
-// ext:fileio
+// =================================================================== OBJECTS
 
-struct Dir: Sym { Dir(Sym*); static Sym* dir(Sym*); Sym*add(Sym*); };
+// ================================================================ ext:FILEIO
+
+// ======================================================= directory
+struct Dir: Sym { Dir(Sym*); static Sym* dir(Sym*);
+	Sym*add(Sym*); };
+// ======================================================= file
 struct File: Sym { File(Sym*); static Sym* file(Sym*); };
 
 extern int yylex();
