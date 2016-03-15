@@ -1,7 +1,7 @@
 %{
 #include "hpp.hpp"
 %}
-%defines %union { Sym*o; }
+%defines %union { Sym*o; }			/* universal bI abstract symbolic type	*/
 %token <o> SYM STR NUM				/* symbol 'string' number				*/
 %token <o> LP RP LQ RQ LC RC LV RV	/* () [] {} <>							*/
 %token <o> EQ AT TILD COLON			/* = @ ~ :								*/
