@@ -23,7 +23,9 @@ string Sym::tagstr() { return "<"+tag+":'"+val+"'>"; }	// <T:'V'> header
 string Sym::dump(int depth) {							// dump as text
 	string S = "\n"+pad(depth)+tagval();				// <T:V>
 	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// par{}ameters
-		S += ","+pr->first;
+		S += "\n" + pad(depth+1) \
+			+ pr->first \
+			+ pr->second->dump(depth+2);
 	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// nest[]ed
 		S += (*it)->dump(depth+1);
 	return S; }
@@ -45,6 +47,9 @@ Sym* Sym::at(Sym*o) { push(o); return this; }			// A @ B apply
 
 Sym* Sym::add(Sym*o) { Sym*R = new Op("+");				// A + B add
 	R->push(this); R->push(o); return R; }
+
+Sym* Sym::pfxadd() { val = "+"+val; return this; }		// +A
+Sym* Sym::pfxsub() { val = "-"+val; return this; }		// -A
 
 // ================================================================= DIRECTIVE
 Directive::Directive(string V):Sym("",V) {
@@ -85,7 +90,8 @@ Cons::Cons(Sym*A,Sym*B):Sym("","") { push(A); push(B); }
 // ======================================================= operator
 Op::Op(string V):Sym("op",V) {}
 Sym* Op::eval() {
-	if (val=="~") return nest[0]; else Sym::eval();	// quote or nest[]ed eval
+	if (val=="~") return nest[0];					// quote or nest[]ed eval
+	else Sym::eval();
 	if (val=="=") return nest[0]->eq(nest[1]);		// A = B assign
 	if (val=="@") return nest[0]->at(nest[1]);		// A @ B apply
 	if (val=="+") return nest[0]->add(nest[1]);		// A + B add
@@ -95,9 +101,31 @@ Sym* Op::eval() {
 Fn::Fn(string V, FN F):Sym("fn",V) { fn=F; }
 Sym* Fn::at(Sym*o) { return fn(o); }
 
-// ======================================================= {la:mbda}
+// ======================================================= {la:mbda} magic
 Lambda::Lambda():Sym("^","^") {}
 Sym* Lambda::eval() { return this; }
+
+Sym* Sym::copy() {										// == recursive copy ==
+	Sym* R = new Sym(tag,val);							// new empty <T:V>
+	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// copy par{}s
+		R->pars[pr->first] = pr->second;				// don't copy par value
+	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// copy nest[]ed
+		R->push((*it)->copy());							// recursive _copy_
+	return R; }
+
+Sym* Sym::replace(string S,Sym*o) {						// == replace by val ==
+	if (val==S) return o;								// object itself -> o
+	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// replace par{}s
+		if (pr->first==S) pr->second=o;
+	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// replaces nest[]ed
+		(*it)=(*it)->replace(S,o);						// recursive replace
+	return this; }
+
+Sym* Lambda::at(Sym*o) {								// == apply by replace
+	Sym* R = copy();									// create lambda copy
+	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// loop over params
+		R=R->replace(pr->first,o);						// replacing by o
+	return R->nest[0]->eval(); }						// ret _evaluated_ copy
 
 // =================================================================== OBJECTS
 

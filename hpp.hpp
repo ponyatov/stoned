@@ -22,14 +22,21 @@ struct Sym {
 	// --------------------------------------------------- par{}ameters
 	map<string,Sym*> pars; void par(Sym*);
 	// --------------------------------------------------- dumping
-	virtual string tagval(); string tagstr();
-	virtual string dump(int=0); string pad(int);
+	virtual string tagval();							// <T:V>
+	string tagstr();									// <T:'V'>
+	string pad(int);									// pad tree element
+	virtual string dump(int=0);							// dump in tree form
 	// --------------------------------------------------- evaluate/compute
 	virtual Sym* eval();
 	// --------------------------------------------------- operators
-	virtual Sym* eq(Sym*);								// A = B assign
-	virtual Sym* at(Sym*);								// A @ B apply
-	virtual Sym* add(Sym*);								// A + B add
+	virtual Sym* eq(Sym*);								// A=B	assign
+	virtual Sym* at(Sym*);								// A@B	apply
+	virtual Sym* pfxadd();								// +A
+	virtual Sym* pfxsub();								// -A
+	virtual Sym* add(Sym*);								// A+B	add
+	// --------------------------------------------------- req for lambda apply
+	Sym* copy();										// recursive copy
+	Sym* replace(string,Sym*);							// rec replace by value
 };
 
 // ====================================================== GLOBAL ENV{}IRONMENT
@@ -67,7 +74,7 @@ typedef Sym*(*FN)(Sym*);
 struct Fn: Sym { Fn(string,FN); FN fn; Sym*at(Sym*); };
 
 // ======================================================= {la:mbda}
-struct Lambda: Sym { Lambda(); Sym*eval(); };
+struct Lambda: Sym { Lambda(); Sym*eval(); Sym*at(Sym*); };
 
 // =================================================================== OBJECTS
 
