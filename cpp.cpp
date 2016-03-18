@@ -120,15 +120,17 @@ Sym* File::file(Sym*o) { return new File(o); }
 map<string,Sym*> env;
 void env_init() {
 	// ----------------------------------------------- metainfo constants
-	env["MODULE"] = new Sym(MODULE);				// module name
-	env["OS"] = new Sym(OS);						// target os
+	env["MODULE"]	= new Str(MODULE);				// module name
+	env["OS"]		= new Str(OS);					// target os
+	env["AUTHOR"]	= new Str(AUTHOR);				// author (c)
+	env["GITHUB"]	= new Str(GITHUB);				// github://
 	// ----------------------------------------------- specials
-	env["T"] = new Sym("bool","true");
-	env["F"] = new Sym("bool","false");
-	env["N"] = new Sym("nil","N");
-	env["D"] = new Sym("default","D");
-	env["E"] = new Sym("error","E");
+	env["T"]		= new Sym("bool","true");		// bool:true
+	env["F"]		= new Sym("bool","false");		// bool:false
+	env["N"]		= new Sym("nil","N");			// nil:
+	env["D"]		= new Sym("default","D");		// default:
+	env["E"]		= new Sym("error","E");			// error:
 	// ----------------------------------------------- fileio
-	env["dir"] = new Fn("dir",Dir::dir);
-	env["file"] = new Fn("file",File::file);
+	env["dir"]		= new Fn("dir",Dir::dir);
+	env["file"]		= new Fn("file",File::file);
 }

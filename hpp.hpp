@@ -1,6 +1,9 @@
 #ifndef _H_STONED
 #define _H_STONED
 
+#define AUTHOR "(c) Dmitry Ponyatov <dponyatov@gmail.com>, GNU LGPL, 2011"
+#define GITHUB "https://github.com/ponyatov/stoned"
+
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
