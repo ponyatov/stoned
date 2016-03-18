@@ -153,8 +153,8 @@ void env_init() {
 	env["AUTHOR"]	= new Str(AUTHOR);				// author (c)
 	env["GITHUB"]	= new Str(GITHUB);				// github://
 	// ----------------------------------------------- specials
-	env["T"]		= new Sym("bool","true");		// bool:true
-	env["F"]		= new Sym("bool","false");		// bool:false
+	env["T"]		= new Sym("bool","T");			// bool:true
+	env["F"]		= new Sym("bool","F");			// bool:false
 	env["N"]		= new Sym("nil","N");			// nil:
 	env["D"]		= new Sym("default","D");		// default:
 	env["E"]		= new Sym("error","E");			// error:

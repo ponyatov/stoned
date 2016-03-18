@@ -27,9 +27,9 @@ N [0-9]+
 <lexstring>.		{LexString+=yytext[0];}
 
 										/* == numbers == */
-{N}\.{N}			TOC(Num,NUM)		/* floating point */
-{N}[eE]{S}{N}		TOC(Num,NUM)		/* exponential */
-{N}					TOC(Int,NUM)		/* integer */
+{S}{N}\.{N}			TOC(Num,NUM)		/* floating point */
+{S}{N}[eE]{S}{N}	TOC(Num,NUM)		/* exponential */
+{S}{N}				TOC(Int,NUM)		/* integer */
 0x[0-9A-F]+			TOC(Hex,NUM)		/* machine hex */
 0b[01]+				TOC(Bin,NUM)		/* bin string */
 
