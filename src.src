@@ -25,7 +25,7 @@ scalars cInts vNums lMachine specials	# check assigned global variables
 
 # fileio: filesystem interface extension
 
-next = dir@MODULE		# create directory for next bI generation
+next = dir@MODULE		" create directory for next bI generation "
 make = next+'Makefile'	# check file create on +'string'
 
 ## check ~ quoting prefix works

@@ -13,7 +13,7 @@ using namespace std;
 
 // ============================================== Abstract Symbolic Type (AST)
 struct Sym {
-	string tag,val;										// tag:value
+	string tag,val,doc;									// tag:value:doc
 	// --------------------------------------------------- constructors
 	Sym(string,string);									// T:V
 	Sym(string);										// token

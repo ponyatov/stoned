@@ -8,7 +8,7 @@ void incLude(Sym*inc) {									// .include processing
 %}
 %option noyywrap
 %option yylineno
-%x lexstring
+%x lexstring docstring
 S [\-\+]?
 N [0-9]+
 %%
@@ -18,13 +18,21 @@ N [0-9]+
 ^\.end				{yyterminate();}					/* .end */
 ^\.inc[ \t]+[^\n]+	{incLude(new Directive(yytext));}	/* .include */
 ^\.[a-z]+[^\n]*		TOC(Directive,DIR)					/* .directive */
-										
+
+														/* 'string' parse */										
 '					{BEGIN(lexstring); LexString="";}
 <lexstring>'		{BEGIN(INITIAL); yylval.o=new Str(LexString); return STR;}
 <lexstring>\\t		{LexString+='\t';}
 <lexstring>\\n		{LexString+='\n';}
 <lexstring>\n		{LexString+=yytext[0];}
 <lexstring>.		{LexString+=yytext[0];}
+														/* "docstring" parse */
+\"					{BEGIN(docstring); LexString="";}
+<docstring>\"		{BEGIN(INITIAL); yylval.o=new Str(LexString); return DOC;}
+<docstring>\\t		{LexString+='\t';}
+<docstring>\\n		{LexString+='\n';}
+<docstring>\n		{LexString+=yytext[0];}
+<docstring>.		{LexString+=yytext[0];}
 
 										/* == numbers == */
 {S}{N}\.{N}			TOC(Num,NUM)		/* floating point */

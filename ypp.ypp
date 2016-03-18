@@ -2,7 +2,7 @@
 #include "hpp.hpp"
 %}
 %defines %union { Sym*o; }			/* universal bI abstract symbolic type	*/
-%token <o> SYM STR NUM DIR			/* symbol 'string' number .directive	*/
+%token <o> SYM STR NUM DIR DOC		/* symbol 'string' number .directive	*/
 %token <o> LP RP LQ RQ LC RC LV RV	/* () [] {} <>							*/
 %token <o> EQ AT TILD COLON			/* = @ ~ :								*/
 %token <o> DOT COMMA				/* . ,									*/
@@ -10,6 +10,7 @@
 %type <o> ex scalar list lambda		/* expression scalar [list] {lam:bda}	*/
 %type <o> vector cons op bracket	/* <vector> co,ns operator bracket		*/
 
+%left DOC
 %left EQ
 %right COMMA
 %left ADD SUB
@@ -25,6 +26,7 @@ REPL : | REPL ex			{ cout << $2->dump();
 				 			cout << $2->eval()->dump();
 				 			cout << "\n==================\n"; } ;
 ex		: scalar | DIR
+		| ex DOC			{ $$=$1; $$->doc=$2->val; }
 		| LP ex RP			{ $$=$2; }
 		| LQ list RQ		{ $$=$2; }
 		| LC lambda RC		{ $$=$2; }

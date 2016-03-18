@@ -18,8 +18,8 @@ void Sym::push(Sym*o) { nest.push_back(o); }
 void Sym::par(Sym*o) { pars[o->val]=o; }
 
 // ------------------------------------------------------- dumping
-string Sym::tagval() { return "<"+tag+":"+val+">"; }	// <T:V> header string
-string Sym::tagstr() { return "<"+tag+":'"+val+"'>"; }	// <T:'V'> header
+string Sym::tagval() { return "<"+tag+":"+val+">"+doc; }	// <T:V> header string
+string Sym::tagstr() { return "<"+tag+":'"+val+"'>"+doc; }	// <T:'V'> header
 string Sym::dump(int depth) {							// dump as text
 	string S = "\n"+pad(depth)+tagval();				// <T:V>
 	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// par{}ameters
