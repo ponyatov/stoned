@@ -1,14 +1,3 @@
-pp = { P: P+'.pp' }
-
-xx = { X: X+'.'+X }
-
-pp@y
-#y+'.pp'
-
-#pp
-
-.end
-
 # bI test suite
 
 # line comment from # till end of line
@@ -46,12 +35,28 @@ doc = next+dir@~doc 	# check file create on +symbol
 ## nested assignments and user defined lambda/apply
 
 pp = { P: P+'pp' }	# add 'pp' string
+xx = { X: pp@X+'.'+pp@X }	# double ext.ext
+
+# lexical program skeleton = lex skeleton = skelex
 
 skelex = [
 	src = next+file@'src.src'	# source file
 	log = next+file@'log.log'	# engine batch run log
 	core = [					# bI interpreter core sources
-		pp@y lpp hpp cpp make
+		ypp = next+xx@y		# parser
+		lpp = next+xx@l		# lexer
+		hpp = next+xx@h		# headers
+		cpp = next+xx@c		# c++ core
+		make				# makefile
 	]	
 	doc							# manual
 ]
+
+inchpp = '#include "hpp.hpp"\n'
+ylhdr = { X: '%{\n'+inchpp+X+'%}\n' }
+
+ypp += ylhdr@''
+lpp += ylhdr@''
+
+string = class:~string
+string . h

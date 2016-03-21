@@ -30,11 +30,15 @@ struct Sym {
 	// --------------------------------------------------- evaluate/compute
 	virtual Sym* eval();
 	// --------------------------------------------------- operators
-	virtual Sym* eq(Sym*);								// A=B	assign
-	virtual Sym* at(Sym*);								// A@B	apply
+	virtual Sym* str();									// str(A)	string repr
+	virtual Sym* eq(Sym*);								// A = B	assign
+	virtual Sym* at(Sym*);								// A @ B	apply
+	virtual Sym* inher(Sym*);							// A : B	inherit
 	virtual Sym* pfxadd();								// +A
 	virtual Sym* pfxsub();								// -A
-	virtual Sym* add(Sym*);								// A+B	add
+	virtual Sym* add(Sym*);								// A + B	add
+	virtual Sym* ins(Sym*);								// A += B	insert
+	//virtual Sym* del(Sym*);								// A -= B	delete
 	// --------------------------------------------------- req for lambda apply
 	Sym* copy();										// recursive copy
 	Sym* replace(string,Sym*);							// rec replace by value
@@ -54,7 +58,7 @@ struct Directive: Sym { Directive(string); string tagval(); };
 struct Scalar: Sym { Scalar(string,string); Sym*eval(); };
 
 struct Str: Scalar { Str(string); Sym*cp();						// string
-	string tagval(); };
+	string tagval(); Sym*add(Sym*); };
 struct Int: Scalar { Int(string); Sym*cp();						// integer
 	Int(long); long val; string tagval(); };
 struct Num: Scalar { Num(string); Sym*cp();						// floating

@@ -57,6 +57,7 @@ N [0-9]+
 \@					TOC(Op,AT)
 \~					TOC(Op,TILD)
 \:					TOC(Op,COLON)
+\%					TOC(Op,PERC)
 \.					TOC(Op,DOT)
 \,					TOC(Op,COMMA)
 

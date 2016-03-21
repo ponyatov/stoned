@@ -16,7 +16,7 @@ Sym* Sym::cp() { return new Sym(tag,val); }				// copy T:V
 void Sym::push(Sym*o) { nest.push_back(o); }
 
 // ------------------------------------------------------- par{}ameters
-void Sym::par(Sym*o) { pars[o->val]=o; }
+void Sym::par(Sym*o) { pars[o->str()->val]=o; }
 
 // ------------------------------------------------------- dumping
 string Sym::tagval() { return "<"+tag+":"+val+"> "+doc; }// <T:V> header
@@ -47,14 +47,21 @@ Sym* Sym::eval() {
 		(*it) = (*it)->eval();							// with objects replace
 	return this; }
 
-// ------------------------------------------------------- operators
+// -------------------------------------------------
 
-Sym* Sym::eq(Sym*o) { env[val]=o; return o; }			// A = B assign
+Sym* Sym::str()		{ return new Str(val); }			// str(A) string repr
+Sym* Sym::eq(Sym*o) { env[str()->val]=o; return o; }	// A = B assign
 Sym* Sym::at(Sym*o) { push(o); return this; }			// A @ B apply
-Sym* Sym::add(Sym*o) { return new Sym(val+o->val); }	// A + B add
+
+Sym* Sym::inher(Sym*o) {								// A : B inherit
+	return new Sym(str()->val,o->str()->val); }
+
+Sym* Sym::add(Sym*o) { return new Sym(val+o->str()->val); }	// A + B add
 
 Sym* Sym::pfxadd() { val = "+"+val; return this; }		// +A
 Sym* Sym::pfxsub() { val = "-"+val; return this; }		// -A
+
+Sym* Sym::ins(Sym*o) { push(o); return this; }			// A+=B insert
 
 // ================================================================= DIRECTIVE
 Directive::Directive(string V):Sym("",V) {
@@ -73,6 +80,7 @@ Sym* Scalar::eval() { return this; }					// block env{} lookup
 Str::Str(string V):Scalar("str",V) {}
 Sym* Str::cp() { return new Str(val); }
 string Str::tagval() { return tagstr(); }
+Sym* Str::add(Sym*o) { return new Str(val+o->str()->val); }
 
 // ======================================================= integer
 Int::Int(string V):Scalar("int",V) { val=atol(V.c_str()); }
@@ -111,7 +119,9 @@ Sym* Op::eval() {
 	else Sym::eval();
 	if (val=="=") return nest[0]->eq(nest[1]);		// A = B assign
 	if (val=="@") return nest[0]->at(nest[1]);		// A @ B apply
+	if (val==":") return nest[0]->inher(nest[1]);	// A : B inherit
 	if (val=="+") return nest[0]->add(nest[1]);		// A + B add
+	if (val=="+=") return nest[0]->ins(nest[1]);	// A += B insert
 	return this; }
 
 // ======================================================= internal function
@@ -149,7 +159,7 @@ Sym* Lambda::at(Sym*o) {								// == apply by replace
 // ================================================================ ext:FILEIO
 
 // ======================================================= directory
-Dir::Dir(Sym*o):Sym("dir",o->val) {}
+Dir::Dir(Sym*o):Sym("dir",o->str()->val) {}
 Sym* Dir::dir(Sym*o) { return new Dir(o); }
 Sym* Dir::add(Sym*o) {
 	Sym*F = o;
@@ -157,7 +167,7 @@ Sym* Dir::add(Sym*o) {
 	push(F); return F; }
 
 // ======================================================= file
-File::File(Sym*o):Sym("file",o->val) {}
+File::File(Sym*o):Sym("file",o->str()->val) {}
 Sym* File::file(Sym*o) { return new File(o); }
 
 // ====================================================== GLOBAL ENV{}IRONMENT
