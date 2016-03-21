@@ -64,6 +64,8 @@ N [0-9]+
 \.					TOC(Op,DOT)
 \,					TOC(Op,COMMA)
 
+\|					TOC(Op,MAP)
+
 \+					TOC(Op,ADD)
 \-					TOC(Op,SUB)
 \*					TOC(Op,MUL)

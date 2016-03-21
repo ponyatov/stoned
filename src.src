@@ -59,7 +59,11 @@ ylhdr = { F: X: F += '%{' += h@hpp += X += '%}' }	# yacc/lex header
 ylhdr@ypp,N											# .ypp header
 ylhdr@lpp,LexString									# .lpp header + LexString
 
-lexer_rules = [
+lexrule = { x_regexp: y_cppcode: x_regexp+' '+y_cppcode }
+
+lexer_rules = lexrule|[
+	'#[^\\n]+'		,	'{}'
+	'[ \\t\\r\\n]+'	,	'{}' 
 ]
 
 lpp += ['%%' lexer_rules '%%']

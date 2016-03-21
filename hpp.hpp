@@ -41,6 +41,7 @@ struct Sym {
 	virtual Sym* add(Sym*);								// A + B	add
 	virtual Sym* ins(Sym*);								// A += B	insert
 	//virtual Sym* del(Sym*);								// A -= B	delete
+	virtual Sym* smap(Sym*);							// A | B	map
 	// --------------------------------------------------- req for lambda apply
 	Sym* copy();										// recursive copy
 	Sym* replace(string,Sym*);							// rec replace by value

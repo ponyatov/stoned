@@ -8,6 +8,7 @@
 %token <o> DOT COMMA PERC			/* . , %								*/
 %token <o> ADD SUB MUL DIV POW		/* + - * / ^							*/
 %token <o> INS DEL					/* += insert -= delete					*/
+%token <o> MAP						/* |									*/
 %type <o> ex scalar list lambda		/* expression scalar [list] {lam:bda}	*/
 %type <o> vector cons op bracket	/* <vector> co,ns operator bracket		*/
 
@@ -52,6 +53,7 @@ ex		: scalar | DIR
 		| ex POW ex			{ $$=$2; $$->push($1); $$->push($3); }
 		| ex INS ex			{ $$=$2; $$->push($1); $$->push($3); }
 		| ex DEL ex			{ $$=$2; $$->push($1); $$->push($3); }
+		| ex MAP ex			{ $$=$2; $$->push($1); $$->push($3); }
 ;
 op		: bracket |EQ |AT |TILD |COLON |DOT |COMMA |ADD |SUB |MUL |DIV |POW ;
 bracket	: LP |RP |LQ |RQ |LC |RC |LV |RV ;

@@ -65,6 +65,13 @@ Sym* Sym::ins(Sym*o) { push(o); return this; }			// A+=B insert
 
 long Sym::size()	{ return 1; }						// size(A)
 
+Sym* Sym::smap(Sym*o) {
+	List* R = new List();
+	for (auto it=o->nest.begin(),e=o->nest.end();it!=e;it++)
+		R->push(at(*it));
+	return R;
+}
+
 // ================================================================= DIRECTIVE
 Directive::Directive(string V):Sym("",V) {
 	while (val.size() && (val[0]!=' ' && val[0]!='\t')) {
@@ -131,6 +138,7 @@ Sym* Op::eval() {
 	if (val==":") return nest[0]->inher(nest[1]);	// A : B inherit
 	if (val=="+") return nest[0]->add(nest[1]);		// A + B add
 	if (val=="+=") return nest[0]->ins(nest[1]);	// A += B insert
+	if (val=="|") return nest[0]->smap(nest[1]);	// A|B map
 	return this; }
 
 // ======================================================= internal function
