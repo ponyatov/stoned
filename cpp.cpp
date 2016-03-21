@@ -19,8 +19,15 @@ void Sym::push(Sym*o) { nest.push_back(o); }
 void Sym::par(Sym*o) { pars[o->val]=o; }
 
 // ------------------------------------------------------- dumping
-string Sym::tagval() { return "<"+tag+":"+val+">"+doc; }	// <T:V> header string
-string Sym::tagstr() { return "<"+tag+":'"+val+"'>"+doc; }	// <T:'V'> header
+string Sym::tagval() { return "<"+tag+":"+val+"> "+doc; }// <T:V> header
+string Sym::tagstr() { string S = "<"+tag+":'";			// <T:'V'> header
+	for (int i=0,n=val.length();i<n;i++) {
+		char c=val[i]; switch (c) {
+		case '\t': S+="\\t"; break;
+		case '\n': S+="\\n"; break;
+		default: S+=c;
+		}}
+	return S+"'> "+doc; }
 string Sym::dump(int depth) {							// dump as text
 	string S = "\n"+pad(depth)+tagval();				// <T:V>
 	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// par{}ameters
@@ -67,20 +74,24 @@ Str::Str(string V):Scalar("str",V) {}
 Sym* Str::cp() { return new Str(val); }
 string Str::tagval() { return tagstr(); }
 
+// ======================================================= integer
 Int::Int(string V):Scalar("int",V) { val=atol(V.c_str()); }
 Int::Int(long L):Scalar("int","") { val=L; }
 Sym* Int::cp() { return new Int(val); }
 string Int::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
+// ======================================================= floating number
 Num::Num(string V):Scalar("num",V) { val=atof(V.c_str()); }
 Num::Num(double D):Scalar("num","") { val=D; }
 Sym* Num::cp() { return new Num(val); }
 string Num::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
+// ======================================================= machine hex
 Hex::Hex(string V):Scalar("hex",V) {}
 Sym* Hex::cp() { return new Hex(val); }
+// ======================================================= binary string
 Bin::Bin(string V):Scalar("bin",V) {}
 Sym* Bin::cp() { return new Bin(val); }
 
@@ -142,7 +153,7 @@ Dir::Dir(Sym*o):Sym("dir",o->val) {}
 Sym* Dir::dir(Sym*o) { return new Dir(o); }
 Sym* Dir::add(Sym*o) {
 	Sym*F = o;
-	if ((o->tag!="dir")&&(o->tag=="file")) F = new File(o);
+	if ((o->tag!="dir")&&(o->tag!="file")) F = new File(o);
 	push(F); return F; }
 
 // ======================================================= file
