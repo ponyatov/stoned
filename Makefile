@@ -3,8 +3,10 @@ MODULE = $(notdir $(CURDIR))
 OS ?= unix
 # TAIL = -n17|-n7|<none>
 
+SRC = src.src ctypes.src 
+
 ################ minimal lex program Makefile ################
-log.log: ./exe.exe src.src
+log.log: ./exe.exe $(SRC)
 	./exe.exe < src.src > log.log && tail $(TAIL) log.log
 C = cpp.cpp $(OS).cpp ypp.tab.cpp lex.yy.c
 H = hpp.hpp $(OS).hpp ypp.tab.hpp
@@ -19,8 +21,4 @@ lex.yy.c: lpp.lpp
 	
 .PHONY: clean
 clean:
-	rm -rf ./exe.exe log.log ypp.tab.?pp lex.yy.c lude.test
-
-src.src: lude.test
-lude.test:
-	touch $@
+	rm -rf ./exe.exe log.log ypp.tab.?pp lex.yy.c

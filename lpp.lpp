@@ -53,6 +53,9 @@ N [0-9]+
 \>					TOC(Op,RV)
 
 										/* == operators == */
+\+\=				TOC(Op,INS)
+\+\-				TOC(Op,DEL)
+
 \=					TOC(Op,EQ)
 \@					TOC(Op,AT)
 \~					TOC(Op,TILD)

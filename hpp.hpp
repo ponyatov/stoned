@@ -102,7 +102,8 @@ struct Class: Sym { Class(string); static Sym* clazz(Sym*);
 struct Dir: Sym { Dir(Sym*); static Sym* dir(Sym*);
 	Sym*add(Sym*); };
 // ======================================================= file
-struct File: Sym { File(Sym*); static Sym* file(Sym*); };
+struct File: Sym { File(Sym*); static Sym* file(Sym*);
+	Sym*h(); };
 
 extern int yylex();
 extern int yylineno;

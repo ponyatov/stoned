@@ -116,7 +116,7 @@ Vector::Vector():Sym("<",">") {}
 
 // ======================================================= co,ns
 Cons::Cons(Sym*A,Sym*B):Sym("","") { push(A); push(B); }
-long Cons::size() { return 1+nest[1]->size(); }
+long Cons::size() { return 2; }//return 1+nest[1]->size(); }
 
 // =============================================================== FUNCTIONALS
 
@@ -188,6 +188,7 @@ Sym* Dir::add(Sym*o) {
 // ====================================================== file
 File::File(Sym*o):Sym("file",o->str()->val) {}
 Sym* File::file(Sym*o) { return new File(o); }
+Sym* File::h() { return new Str("#include \""+val+"\""); }
 
 // ==================================================================== CODEGEN
 

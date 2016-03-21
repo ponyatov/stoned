@@ -2,8 +2,6 @@
 
 # line comment from # till end of line
 
-.inc lude.test
-
 scalars = [ # \ complex test: scalars, composites and var/assign
 	symbol 'string'
 	
@@ -52,18 +50,16 @@ skelex = [
 	doc							# manual
 ]
 
-inchpp = '#include "hpp.hpp"'
-ylhdr = { F: X: [ F X ] }
-
-ylhdr@1,2
-
-.end
-
-string = class@~string
+# test .include directive and object subsystem using ctypes declarations
+.inc ctypes.src
 
 LexString = string@~LexString 
 
-ypp += ylhdr@''
+ylhdr = { F: X: F += '%{' += h@hpp += X += '%}' }	# yacc/lex header
+ylhdr@ypp,N											# .ypp header
+ylhdr@lpp,LexString									# .lpp header + LexString
 
-ylhdr@(lpp,c@LexString)
+lexer_rules = [
+]
 
+lpp += ['%%' lexer_rules '%%']
