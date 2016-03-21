@@ -16,7 +16,7 @@
 %left ADD SUB
 %left MUL DIV
 %left POW
-%left AT
+%right AT
 %left PFX
 %left TILD
 %left COLON

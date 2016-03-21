@@ -17,6 +17,7 @@ struct Sym {
 	// --------------------------------------------------- constructors
 	Sym(string,string);									// T:V
 	Sym(string);										// token
+	virtual Sym* cp();									// copy constructor T:V
 	// --------------------------------------------------- nest[]ed
 	vector<Sym*> nest; void push(Sym*);
 	// --------------------------------------------------- par{}ameters
@@ -52,11 +53,14 @@ struct Directive: Sym { Directive(string); string tagval(); };
 
 struct Scalar: Sym { Scalar(string,string); Sym*eval(); };
 
-struct Str: Scalar { Str(string); string tagval(); };				// string
-struct Int: Scalar { Int(string); long val; string tagval(); };		// integer
-struct Num: Scalar { Num(string); double val; string tagval(); };	// floating
-struct Hex: Scalar { Hex(string); };								// hex
-struct Bin: Scalar { Bin(string); };								// bin str
+struct Str: Scalar { Str(string); Sym*cp();						// string
+	string tagval(); };
+struct Int: Scalar { Int(string); Sym*cp();						// integer
+	Int(long); long val; string tagval(); };
+struct Num: Scalar { Num(string); Sym*cp();						// floating
+	Num(double); double val; string tagval(); };
+struct Hex: Scalar { Hex(string); Sym*cp(); };					// hex
+struct Bin: Scalar { Bin(string); Sym*cp(); };					// bin str
 
 // ================================================================ COMPOSITES
 
@@ -67,7 +71,7 @@ struct Cons: Sym { Cons(Sym*,Sym*); };							// co,ns pair
 // =============================================================== FUNCTIONALS
 
 // ======================================================= operator
-struct Op: Sym { Op(string); Sym*eval(); };
+struct Op: Sym { Op(string); Sym*cp(); Sym*eval(); };
 
 // ======================================================= internal function
 typedef Sym*(*FN)(Sym*);

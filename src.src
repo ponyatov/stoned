@@ -1,3 +1,14 @@
+pp = { P: P+'.pp' }
+
+xx = { X: X+'.'+X }
+
+pp@y
+#y+'.pp'
+
+#pp
+
+.end
+
 # bI test suite
 
 # line comment from # till end of line

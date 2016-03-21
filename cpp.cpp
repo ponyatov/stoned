@@ -10,6 +10,7 @@ int main() { env_init(); return yyparse(); }
 // ------------------------------------------------------- constructors
 Sym::Sym(string T,string V) { tag=T; val=V; }			// <T:V>
 Sym::Sym(string V):Sym("",V) {}							// token
+Sym* Sym::cp() { return new Sym(tag,val); }				// copy T:V
 
 // ------------------------------------------------------- nest[]ed elements
 void Sym::push(Sym*o) { nest.push_back(o); }
@@ -42,11 +43,8 @@ Sym* Sym::eval() {
 // ------------------------------------------------------- operators
 
 Sym* Sym::eq(Sym*o) { env[val]=o; return o; }			// A = B assign
-
 Sym* Sym::at(Sym*o) { push(o); return this; }			// A @ B apply
-
-Sym* Sym::add(Sym*o) { Sym*R = new Op("+");				// A + B add
-	R->push(this); R->push(o); return R; }
+Sym* Sym::add(Sym*o) { return new Sym(val+o->val); }	// A + B add
 
 Sym* Sym::pfxadd() { val = "+"+val; return this; }		// +A
 Sym* Sym::pfxsub() { val = "-"+val; return this; }		// -A
@@ -66,18 +64,25 @@ Sym* Scalar::eval() { return this; }					// block env{} lookup
 
 // ======================================================= string
 Str::Str(string V):Scalar("str",V) {}
+Sym* Str::cp() { return new Str(val); }
 string Str::tagval() { return tagstr(); }
 
 Int::Int(string V):Scalar("int",V) { val=atol(V.c_str()); }
+Int::Int(long L):Scalar("int","") { val=L; }
+Sym* Int::cp() { return new Int(val); }
 string Int::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
 Num::Num(string V):Scalar("num",V) { val=atof(V.c_str()); }
+Num::Num(double D):Scalar("num","") { val=D; }
+Sym* Num::cp() { return new Num(val); }
 string Num::tagval() { ostringstream os; os<<"<"<<tag<<":"<<val<<">";
 	return os.str(); }
 
 Hex::Hex(string V):Scalar("hex",V) {}
+Sym* Hex::cp() { return new Hex(val); }
 Bin::Bin(string V):Scalar("bin",V) {}
+Sym* Bin::cp() { return new Bin(val); }
 
 // ================================================================ COMPOSITES
 
@@ -89,6 +94,7 @@ Cons::Cons(Sym*A,Sym*B):Sym("","") { push(A); push(B); }
 
 // ======================================================= operator
 Op::Op(string V):Sym("op",V) {}
+Sym* Op::cp() { return new Op(val); }
 Sym* Op::eval() {
 	if (val=="~") return nest[0];					// quote or nest[]ed eval
 	else Sym::eval();
@@ -106,7 +112,7 @@ Lambda::Lambda():Sym("^","^") {}
 Sym* Lambda::eval() { return this; }
 
 Sym* Sym::copy() {										// == recursive copy ==
-	Sym* R = new Sym(tag,val);							// new empty <T:V>
+	Sym* R = cp();										// copy object T:V
 	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// copy par{}s
 		R->pars[pr->first] = pr->second;				// don't copy par value
 	for (auto it=nest.begin(),e=nest.end();it!=e;it++)	// copy nest[]ed
@@ -123,7 +129,7 @@ Sym* Sym::replace(string S,Sym*o) {						// == replace by val ==
 
 Sym* Lambda::at(Sym*o) {								// == apply by replace
 	Sym* R = copy();									// create lambda copy
-	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// loop over params
+	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// loop over par{}ams
 		R=R->replace(pr->first,o);						// replacing by o
 	return R->nest[0]->eval(); }						// ret _evaluated_ copy
 
@@ -159,6 +165,6 @@ void env_init() {
 	env["D"]		= new Sym("default","D");		// default:
 	env["E"]		= new Sym("error","E");			// error:
 	// ----------------------------------------------- fileio
-	env["dir"]		= new Fn("dir",Dir::dir);
-	env["file"]		= new Fn("file",File::file);
+	env["dir"]		= new Fn("dir",Dir::dir);		// directory
+	env["file"]		= new Fn("file",File::file);	// file
 }
