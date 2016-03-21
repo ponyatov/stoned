@@ -63,6 +63,8 @@ Sym* Sym::pfxsub() { val = "-"+val; return this; }		// -A
 
 Sym* Sym::ins(Sym*o) { push(o); return this; }			// A+=B insert
 
+long Sym::size()	{ return 1; }						// size(A)
+
 // ================================================================= DIRECTIVE
 Directive::Directive(string V):Sym("",V) {
 	while (val.size() && (val[0]!=' ' && val[0]!='\t')) {
@@ -105,9 +107,16 @@ Sym* Bin::cp() { return new Bin(val); }
 
 // ================================================================ COMPOSITES
 
+// ======================================================= [list]
 List::List():Sym("[","]") {}
+long List::size() { return nest.size(); }
+
+// ======================================================= <vector>
 Vector::Vector():Sym("<",">") {}
+
+// ======================================================= co,ns
 Cons::Cons(Sym*A,Sym*B):Sym("","") { push(A); push(B); }
+long Cons::size() { return 1+nest[1]->size(); }
 
 // =============================================================== FUNCTIONALS
 
@@ -150,11 +159,21 @@ Sym* Sym::replace(string S,Sym*o) {						// == replace by val ==
 
 Sym* Lambda::at(Sym*o) {								// == apply by replace
 	Sym* R = copy();									// create lambda copy
-	for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++)	// loop over par{}ams
-		R=R->replace(pr->first,o);						// replacing by o
+	//cerr << pars.size() << " " << o->size() << "\n";
+	assert(pars.size()==o->size());
+	int i=0; for (auto pr=pars.begin(),e=pars.end();pr!=e;pr++,i++)
+		if (o->size()==1)
+			R=R->replace(pr->first,o);					// replacing by o
+		else {
+			R=R->replace(pr->first,o->nest[i]);			// replacing by o
+		}
 	return R->nest[0]->eval(); }						// ret _evaluated_ copy
 
 // =================================================================== OBJECTS
+
+Class::Class(string V):Sym("class",V) {}
+Sym* Class::clazz(Sym*o) { return new Class(o->str()->val); }
+Sym* Class::at(Sym*o) { return new Sym(val,o->str()->val); }
 
 // ================================================================ ext:FILEIO
 
@@ -166,11 +185,18 @@ Sym* Dir::add(Sym*o) {
 	if ((o->tag!="dir")&&(o->tag!="file")) F = new File(o);
 	push(F); return F; }
 
-// ======================================================= file
+// ====================================================== file
 File::File(Sym*o):Sym("file",o->str()->val) {}
 Sym* File::file(Sym*o) { return new File(o); }
 
-// ====================================================== GLOBAL ENV{}IRONMENT
+// ==================================================================== CODEGEN
+
+Sym* Sym::hh(Sym*o) { return o->h(); }
+Sym* Sym::h()		{ return new Str("extern "+tag+' '+val+';'); }
+Sym* Sym::cc(Sym*o) { return o->c(); }
+Sym* Sym::c()		{ return new Str(tag+' '+val+';'); }
+
+// ======================================================= GLOBAL ENV{}IRONMENT
 
 map<string,Sym*> env;
 void env_init() {
@@ -188,4 +214,9 @@ void env_init() {
 	// ----------------------------------------------- fileio
 	env["dir"]		= new Fn("dir",Dir::dir);		// directory
 	env["file"]		= new Fn("file",File::file);	// file
+	// ----------------------------------------------- class subsystem
+	env["class"]	= new Fn("class",Class::clazz);
+	// ----------------------------------------------- codegen
+	env["h"]		= new Fn("h",Sym::hh);
+	env["c"]		= new Fn("c",Sym::cc);
 }

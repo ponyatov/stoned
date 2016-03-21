@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <cassert>
 #include <vector>
 #include <map>
 using namespace std;
@@ -31,6 +32,7 @@ struct Sym {
 	virtual Sym* eval();
 	// --------------------------------------------------- operators
 	virtual Sym* str();									// str(A)	string repr
+	virtual long size();								// size(A)
 	virtual Sym* eq(Sym*);								// A = B	assign
 	virtual Sym* at(Sym*);								// A @ B	apply
 	virtual Sym* inher(Sym*);							// A : B	inherit
@@ -42,6 +44,11 @@ struct Sym {
 	// --------------------------------------------------- req for lambda apply
 	Sym* copy();										// recursive copy
 	Sym* replace(string,Sym*);							// rec replace by value
+	// --------------------------------------------------- codegen
+	virtual Sym* h();
+	static Sym* hh(Sym*);
+	virtual Sym* c();
+	static Sym* cc(Sym*);
 };
 
 // ====================================================== GLOBAL ENV{}IRONMENT
@@ -68,9 +75,9 @@ struct Bin: Scalar { Bin(string); Sym*cp(); };					// bin str
 
 // ================================================================ COMPOSITES
 
-struct List: Sym { List(); };									// [list]
+struct List: Sym { List(); long size(); };						// [list]
 struct Vector: Sym { Vector(); };								// <vector>
-struct Cons: Sym { Cons(Sym*,Sym*); };							// co,ns pair
+struct Cons: Sym { Cons(Sym*,Sym*); long size(); };				// co,ns pair
 
 // =============================================================== FUNCTIONALS
 
@@ -85,6 +92,9 @@ struct Fn: Sym { Fn(string,FN); FN fn; Sym*at(Sym*); };
 struct Lambda: Sym { Lambda(); Sym*eval(); Sym*at(Sym*); };
 
 // =================================================================== OBJECTS
+
+struct Class: Sym { Class(string); static Sym* clazz(Sym*);
+	Sym*at(Sym*); };
 
 // ================================================================ ext:FILEIO
 

@@ -13,11 +13,11 @@
 
 %left DOC
 %left EQ
-%right COMMA
 %left ADD SUB
 %left MUL DIV
 %left POW
 %right AT
+%right COMMA
 %left PFX
 %left TILD
 %left PERC

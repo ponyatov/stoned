@@ -52,11 +52,18 @@ skelex = [
 	doc							# manual
 ]
 
-inchpp = '#include "hpp.hpp"\n'
-ylhdr = { X: '%{\n'+inchpp+X+'%}\n' }
+inchpp = '#include "hpp.hpp"'
+ylhdr = { F: X: [ F X ] }
+
+ylhdr@1,2
+
+.end
+
+string = class@~string
+
+LexString = string@~LexString 
 
 ypp += ylhdr@''
-lpp += ylhdr@''
 
-string = class:~string
-string . h
+ylhdr@(lpp,c@LexString)
+
