@@ -39,6 +39,7 @@ struct Sym {
 	virtual Sym* pfxadd();								// +A
 	virtual Sym* pfxsub();								// -A
 	virtual Sym* add(Sym*);								// A + B	add
+	virtual Sym* dot(Sym*);								// A . B	index
 	virtual Sym* ins(Sym*);								// A += B	insert
 	//virtual Sym* del(Sym*);								// A -= B	delete
 	virtual Sym* smap(Sym*);							// A | B	map
@@ -56,6 +57,16 @@ struct Sym {
 
 extern map<string,Sym*> env;
 extern void env_init();
+
+// ================================================================== SPECIALS
+
+extern Sym* T;	// bool:true
+extern Sym* F;	// bool:false
+extern Sym* N;	// nil:
+extern Sym* D;	// default:
+extern Sym* E;	// error:
+extern Sym* R;	// signal:read
+extern Sym* W;	// signal:write
 
 // ================================================================= DIRECTIVE
 
@@ -95,21 +106,24 @@ struct Lambda: Sym { Lambda(); Sym*eval(); Sym*at(Sym*); };
 // =================================================================== OBJECTS
 
 struct Class: Sym { Class(string); static Sym* clazz(Sym*);
-	Sym*at(Sym*); };
+	Sym*at(Sym*); Sym*h(); };
 
 // ================================================================ ext:FILEIO
 
 // ======================================================= directory
 struct Dir: Sym { Dir(Sym*); static Sym* dir(Sym*);
-	Sym*add(Sym*); };
+	Sym*add(Sym*); Sym*dot(Sym*); };
 // ======================================================= file
 struct File: Sym { File(Sym*); static Sym* file(Sym*);
 	Sym*h(); };
 
+// ==================================================== LEXER/PARSER INTERFACE
+// ======================================================= lexer /flex/
 extern int yylex();
 extern int yylineno;
 extern char* yytext;
 #define TOC(C,X) { yylval.o = new C(yytext); return X; }
+// ======================================================= parser /bison/
 extern int yyparse();
 extern void yyerror(string);
 #include "ypp.tab.hpp"

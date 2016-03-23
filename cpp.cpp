@@ -61,6 +61,8 @@ Sym* Sym::add(Sym*o) { return new Sym(val+o->str()->val); }	// A + B add
 Sym* Sym::pfxadd() { val = "+"+val; return this; }		// +A
 Sym* Sym::pfxsub() { val = "-"+val; return this; }		// -A
 
+Sym* Sym::dot(Sym*o) { return new Cons(this,o); }		// A . B index
+
 Sym* Sym::ins(Sym*o) { push(o); return this; }			// A+=B insert
 
 long Sym::size()	{ return 1; }						// size(A)
@@ -71,6 +73,16 @@ Sym* Sym::smap(Sym*o) {
 		R->push(at(*it));
 	return R;
 }
+
+// ================================================================== SPECIALS
+
+Sym* T = new Sym("bool","T");			// bool:true
+Sym* F = new Sym("bool","F");			// bool:false
+Sym* N = new Sym("nil","N");			// nil:
+Sym* D = new Sym("default","D");		// default:
+Sym* E = new Sym("error","E");			// error:
+Sym* R = new Sym("read","R");			// signal:read
+Sym* W = new Sym("write","W");			// signal:write
 
 // ================================================================= DIRECTIVE
 Directive::Directive(string V):Sym("",V) {
@@ -139,6 +151,7 @@ Sym* Op::eval() {
 	if (val=="+") return nest[0]->add(nest[1]);		// A + B add
 	if (val=="+=") return nest[0]->ins(nest[1]);	// A += B insert
 	if (val=="|") return nest[0]->smap(nest[1]);	// A|B map
+	if (val==".") return nest[0]->dot(nest[1]);		// A.B
 	return this; }
 
 // ======================================================= internal function
@@ -202,6 +215,8 @@ Sym* File::h() { return new Str("#include \""+val+"\""); }
 
 Sym* Sym::hh(Sym*o) { return o->h(); }
 Sym* Sym::h()		{ return new Str("extern "+tag+' '+val+';'); }
+Sym* Class::h()		{ return new Str("class bI_"+val+": public "+tag+" {};"); }
+
 Sym* Sym::cc(Sym*o) { return o->c(); }
 Sym* Sym::c()		{ return new Str(tag+' '+val+';'); }
 
@@ -215,16 +230,18 @@ void env_init() {
 	env["AUTHOR"]	= new Str(AUTHOR);				// author (c)
 	env["GITHUB"]	= new Str(GITHUB);				// github://
 	// ----------------------------------------------- specials
-	env["T"]		= new Sym("bool","T");			// bool:true
-	env["F"]		= new Sym("bool","F");			// bool:false
-	env["N"]		= new Sym("nil","N");			// nil:
-	env["D"]		= new Sym("default","D");		// default:
-	env["E"]		= new Sym("error","E");			// error:
+	env["T"]		= T;							// bool:true
+	env["F"]		= F;							// bool:false
+	env["N"]		= N;							// nil:
+	env["D"]		= D;							// default:
+	env["E"]		= E;							// error:
+	env["R"]		= R;							// signal:read
+	env["W"]		= W;							// signal:write
 	// ----------------------------------------------- fileio
 	env["dir"]		= new Fn("dir",Dir::dir);		// directory
 	env["file"]		= new Fn("file",File::file);	// file
 	// ----------------------------------------------- class subsystem
-	env["class"]	= new Fn("class",Class::clazz);
+	env["class"]	= new Class("class");
 	// ----------------------------------------------- codegen
 	env["h"]		= new Fn("h",Sym::hh);
 	env["c"]		= new Fn("c",Sym::cc);

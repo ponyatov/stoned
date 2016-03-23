@@ -1,3 +1,10 @@
+
+cgt = dir@'codegen_test'
+
+cgt.W
+
+.end
+
 # bI test suite
 
 # line comment from # till end of line
